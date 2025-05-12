@@ -45,7 +45,7 @@ def summarize():
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4-turbo",  # <-- change here
+            model="gpt-3.5-turbo",  # <-- change here
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=400
@@ -59,7 +59,7 @@ def summarize():
 
     return jsonify({
         "response_type": "in_channel",
-        "text": f"*Summary by GPT-4:*\n{story}"
+        "text": f"*Summary by GPT-3.5-turbo:*\n{story}"
     })
 
 @app.route("/", methods=["GET"])
