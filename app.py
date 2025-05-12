@@ -8,7 +8,6 @@ app = Flask(__name__)
 
 client = OpenAI()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")
 
 def verify_slack_request(req):
