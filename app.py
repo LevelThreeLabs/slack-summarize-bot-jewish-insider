@@ -42,5 +42,11 @@ def summarize():
         "text": f"*Summary by GPT-4:*\n{story}"
     })
 
+@app.route("/", methods=["GET"])
+def health_check():
+    return "Summarize bot is running!", 200
+
+
+
 if __name__ == "__main__":
     app.run()
