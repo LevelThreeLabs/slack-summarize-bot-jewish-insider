@@ -25,17 +25,36 @@ def summarize():
     if not verify_slack_request(request):
         return "Unauthorized", 403
 
-    user_input = request.form.get("text", "")
+    user_input = request.form.get("text", "").strip()
+    
+    if not user_input:
+        return jsonify({
+            "response_type": "ephemeral",
+            "text": "Please provide text to summarize."
+        })
+
+    # If it's just a URL, return a message for now
+    if user_input.startswith("http"):
+        return jsonify({
+            "response_type": "ephemeral",
+            "text": "URL summarization is not yet supported. Please paste text instead."
+        })
+
     prompt = f"""Write a short, news-style summary of the following message:\n\n{user_input}"""
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=400
-    )
-
-    story = response.choices[0].message.content.strip()
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            max_tokens=400
+        )
+        story = response.choices[0].message.content.strip()
+    except Exception as e:
+        return jsonify({
+            "response_type": "ephemeral",
+            "text": f"Something went wrong: {str(e)}"
+        })
 
     return jsonify({
         "response_type": "in_channel",
