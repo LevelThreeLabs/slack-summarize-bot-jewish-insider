@@ -43,13 +43,17 @@ def summarize():
     prompt = f"""Write a short, news-style summary of the following message:\n\n{user_input}"""
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-            max_tokens=400
-        )
-        story = response.choices[0].message.content.strip()
+       from openai import OpenAI
+
+client = OpenAI()
+
+response = client.chat.completions.create(
+    model="gpt-4",
+    messages=[{"role": "user", "content": prompt}],
+    temperature=0.7,
+    max_tokens=400
+)
+story = response.choices[0].message.content.strip()
     except Exception as e:
         return jsonify({
             "response_type": "ephemeral",
