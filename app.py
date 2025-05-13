@@ -55,9 +55,14 @@ def summarize():
             domain = user_input.split("/")[2]
             use_proxy = any(proxy_domain in domain for proxy_domain in use_proxy_domains)
 
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+            }
+
             page = requests.get(
                 user_input,
                 proxies=proxies if use_proxy else None,
+                headers=headers,
                 timeout=30
             )
             soup = BeautifulSoup(page.text, "html.parser")
@@ -68,7 +73,7 @@ def summarize():
         except Exception as e:
             return jsonify({
                 "response_type": "ephemeral",
-                "text": f"Failed to fetch URL: {str(e)}"
+                "text": "⚠️ This site blocked our summarizer or took too long to respond. Try a different article or contact the team for help."
             })
     else:
         content_to_summarize = user_input
