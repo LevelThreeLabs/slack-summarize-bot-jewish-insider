@@ -49,7 +49,7 @@ def summarize():
     # If it's a URL, fetch and extract text
     if user_input.startswith("http"):
         try:
-            page = requests.get(user_input, proxies=proxies, timeout=30)
+            page = requests.get(user_input, timeout=30)
             soup = BeautifulSoup(page.text, "html.parser")
             title = soup.title.string.strip() if soup.title else "Untitled"
             paragraphs = soup.find_all("p")
