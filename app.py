@@ -1,6 +1,6 @@
 import threading
 
-@app.route("/summarize", methods=["POST"])
+@app.route("/summarize-for-web", methods=["POST"])
 def summarize():
     user_input = request.form.get("text", "").strip()
     response_url = request.form.get("response_url")
