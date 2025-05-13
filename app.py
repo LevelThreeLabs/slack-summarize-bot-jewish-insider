@@ -1,33 +1,53 @@
+from flask import Flask, request, jsonify
+from openai import OpenAI
+import os
+import hmac
+import hashlib
 import requests
 from bs4 import BeautifulSoup
 
+app = Flask(__name__)
+client = OpenAI()
+SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")
+
+def verify_slack_request(req):
+    timestamp = req.headers.get('X-Slack-Request-Timestamp')
+    sig_basestring = f"v0:{timestamp}:{req.get_data(as_text=True)}"
+    my_signature = 'v0=' + hmac.new(
+        SLACK_SIGNING_SECRET.encode(),
+        sig_basestring.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    slack_signature = req.headers.get('X-Slack-Signature')
+    return hmac.compare_digest(my_signature, slack_signature)
+
 @app.route("/summarize", methods=["POST"])
 def summarize():
+    # Optional: Uncomment in production
     # if not verify_slack_request(request):
     #     return "Unauthorized", 403
 
     user_input = request.form.get("text", "").strip()
-    
+
     if not user_input:
         return jsonify({
             "response_type": "ephemeral",
             "text": "Please provide text to summarize."
         })
 
-    # 🔍 URL Detected
+    # If it's a URL, fetch and extract text
     if user_input.startswith("http"):
         try:
             page = requests.get(user_input, timeout=5)
             soup = BeautifulSoup(page.text, "html.parser")
-            title = soup.title.string if soup.title else ""
+            title = soup.title.string.strip() if soup.title else "Untitled"
             paragraphs = soup.find_all("p")
-            body_text = " ".join(p.get_text() for p in paragraphs[:10])  # Limit to 10 <p> tags
-
-            content_to_summarize = f"Title: {title}\n\nContent: {body_text}"
+            content = " ".join(p.get_text() for p in paragraphs[:10])
+            content_to_summarize = f"Title: {title}\n\n{content}"
         except Exception as e:
             return jsonify({
                 "response_type": "ephemeral",
-                "text": f"Failed to fetch or parse URL: {str(e)}"
+                "text": f"Failed to fetch URL: {str(e)}"
             })
     else:
         content_to_summarize = user_input
@@ -52,3 +72,11 @@ def summarize():
         "response_type": "in_channel",
         "text": f"*Summary by GPT-3.5-turbo:*\n{story}"
     })
+
+@app.route("/", methods=["GET"])
+def health_check():
+    return "Summarize bot is running!", 200
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
