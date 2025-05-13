@@ -32,7 +32,7 @@ def verify_slack_request(req):
     slack_signature = req.headers.get('X-Slack-Signature')
     return hmac.compare_digest(my_signature, slack_signature)
 
-@app.route("/summarize", methods=["POST"])
+@app.route("/summarize-for-web", methods=["POST"])
 def summarize():
     # Optional: Uncomment in production
     # if not verify_slack_request(request):
