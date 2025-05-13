@@ -10,7 +10,7 @@ proxies = {
     "https": f"http://{proxy_user}:{proxy_pass}@{proxy_host}"
 }
 
-url = "https://www.bloomberg.com/news/articles/2025-05-12/abu-dhabi-former-stanchart-dealmaker-sets-up-advisory-firm-elaeo"
+url = "http://ip-api.com/json"
 
 try:
     response = requests.get(url, proxies=proxies, timeout=20)
