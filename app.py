@@ -23,9 +23,9 @@ def verify_slack_request(req):
 
 @app.route("/summarize", methods=["POST"])
 def summarize():
-    # For testing only — comment out after verification
-    # if not verify_slack_request(request):
-    #     return "Unauthorized", 403
+    For testing only — comment out after verification
+    if not verify_slack_request(request):
+        return "Unauthorized", 403
 
     user_input = request.form.get("text", "").strip()
     
