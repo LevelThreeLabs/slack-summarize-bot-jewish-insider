@@ -52,7 +52,7 @@ def summarize():
     else:
         content_to_summarize = user_input
 
-        prompt = f"""
+    prompt = f"""
 Please generate a concise news-style output from the following content. Your response should be between 2-5 paragraphs and structured as follows:
 
 1. A clear, engaging headline.
