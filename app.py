@@ -16,6 +16,13 @@ proxies = {
     "https": f"http://{PROXY_USER}:{PROXY_PASS}@{PROXY_HOST}",
 }
 
+# Domains that require proxy access (due to bot protection)
+use_proxy_domains = {
+    "bloomberg.com",
+    "wsj.com",
+    "mediamatters.org",
+    "nytimes.com"
+}
 
 app = Flask(__name__)
 client = OpenAI()
@@ -34,10 +41,6 @@ def verify_slack_request(req):
 
 @app.route("/summarize-for-web", methods=["POST"])
 def summarize():
-    # Optional: Uncomment in production
-    # if not verify_slack_request(request):
-    #     return "Unauthorized", 403
-
     user_input = request.form.get("text", "").strip()
 
     if not user_input:
@@ -49,7 +52,14 @@ def summarize():
     # If it's a URL, fetch and extract text
     if user_input.startswith("http"):
         try:
-            page = requests.get(user_input, timeout=30)
+            domain = user_input.split("/")[2]
+            use_proxy = any(proxy_domain in domain for proxy_domain in use_proxy_domains)
+
+            page = requests.get(
+                user_input,
+                proxies=proxies if use_proxy else None,
+                timeout=30
+            )
             soup = BeautifulSoup(page.text, "html.parser")
             title = soup.title.string.strip() if soup.title else "Untitled"
             paragraphs = soup.find_all("p")
@@ -73,7 +83,6 @@ Please generate a concise news-style output from the following content. Your res
 Here is the source content:
 {content_to_summarize}
 """
-
 
     try:
         response = client.chat.completions.create(
