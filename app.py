@@ -6,6 +6,17 @@ import hashlib
 import requests
 from bs4 import BeautifulSoup
 
+# Proxy configuration for residential access
+PROXY_USER = os.getenv("PROXY_USER")
+PROXY_PASS = os.getenv("PROXY_PASS")
+PROXY_HOST = "rp.scrapegw.com:6060"
+
+proxies = {
+    "http": f"http://{PROXY_USER}:{PROXY_PASS}@{PROXY_HOST}",
+    "https": f"http://{PROXY_USER}:{PROXY_PASS}@{PROXY_HOST}",
+}
+
+
 app = Flask(__name__)
 client = OpenAI()
 SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")
