@@ -52,7 +52,17 @@ def summarize():
     else:
         content_to_summarize = user_input
 
-    prompt = f"""Write a short, news-style summary of the following content:\n\n{content_to_summarize}"""
+        prompt = f"""
+Please generate a concise news-style output from the following content. Your response should be between 2-5 paragraphs and structured as follows:
+
+1. A clear, engaging headline.
+2. A 1-2 paragraph summary of the article’s main content and reporting.
+3. A final paragraph (or two) labeled “Why it matters:” that gives context and significance — why this story is important, notable, or has broader implications.
+
+Here is the source content:
+{content_to_summarize}
+"""
+
 
     try:
         response = client.chat.completions.create(
